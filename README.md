@@ -2,7 +2,7 @@
 
 > **"See your property's true condition, anywhere in the world, without ever stepping through the door."**
 
-[![CI Pipeline](https://img.shields.io/badge/CI-GitHub_Actions-blue?logo=github-actions)](https://github.com/Raj-vardhan01/GroundPulse/actions)
+[![CI Pipeline](https://img.shields.io/badge/CI-GitHub_Actions-blue?logo=github-actions)](https://github.com/GroundPulse-App/GroundPulse/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Frontend-Next.js_14-black?logo=next.js)](https://nextjs.org/)
 [![NestJS](https://img.shields.io/badge/Backend-NestJS_10-E0234E?logo=nestjs)](https://nestjs.com/)
@@ -11,7 +11,7 @@
 [![Redis & BullMQ](https://img.shields.io/badge/Queue-Redis_%2B_BullMQ-DC382D?logo=redis)](https://bullmq.io/)
 [![Socket.IO](https://img.shields.io/badge/Real--Time-Socket.IO-010101?logo=socket.io)](https://socket.io/)
 
-**Project Code:** `WEB-01` | **Track:** Full-Stack Web Platform Development | **Repository:** [github.com/Raj-vardhan01/GroundPulse](https://github.com/Raj-vardhan01/GroundPulse)
+**Project Code:** `WEB-01` | **Track:** Full-Stack Web Platform Development | **Organisation:** [github.com/GroundPulse-App](https://github.com/GroundPulse-App)
 
 ---
 
@@ -40,20 +40,25 @@ Small issues (leaks, electrical faults, security gaps) go undetected until they 
 
 ## ✨ Features Matrix
 
-| Feature | Description | Status |
-| :--- | :--- | :---: |
-| **Property Registration & Overview** | Add properties with address, type, and cover photo; multi-property dashboard cards | ✅ |
-| **Property Health Score** | Auto-computed 0–100 health score with animated SVG ring and trend history | ✅ |
-| **Inspection Scheduling** | Book one-off or recurring inspections with automated inspector matching | ✅ |
-| **Digital Inspection Checklist** | Room/area checklist with Pass/Fail/Attention status, draft save/resume, and photo capture | ✅ |
-| **Automated 48h SLA Reports** | BullMQ async report compiler generating shareable media-rich PDF/web summaries | ✅ |
-| **Maintenance Issue Flagging** | Inspector flags issues by category (Leak, Electrical, Security, Cleanliness, Other) with photos | ✅ |
-| **Owner Approve / Decline Loop** | Owner reviews flagged issues with photo evidence before approving repairs or declining with reasons | ✅ |
-| **Verified Service Provider Matching** | Admin assigns approved repairs exclusively to vetted local providers (`verified: true` gate) | ✅ |
-| **End-to-End Repair Tracker** | Real-time stage visibility: `Requested` → `Assigned` → `In Progress` → `Completed` | ✅ |
-| **Real-Time Push Gateway** | Socket.IO room-scoped event delivery (`user:{userId}`) for instant notifications | ✅ |
-| **Role-Based Portals (RBAC)** | Dedicated, server-enforced interfaces for Owner, Inspector, Admin, and Provider | ✅ |
-| **Immutable Audit Trail** | Insert-only audit logging on all approvals, assignments, and status transitions | ✅ |
+Every feature below is **specified and designed**, with its owning service and
+priority recorded. None is implemented yet — the service repositories are still
+empty. Priorities come from the MoSCoW breakdown in
+[`docs/03_PRD_AND_USER_STORIES.md`](docs/03_PRD_AND_USER_STORIES.md).
+
+| Feature | Description | Priority | Owning service |
+| :--- | :--- | :---: | :--- |
+| **Property Registration & Overview** | Add properties with address, type, and cover photo; multi-property dashboard cards | Must | `property-inspection` |
+| **Property Health Score** | Auto-computed 0–100 health score with animated SVG ring and trend history | Should | `property-inspection` |
+| **Inspection Scheduling** | Book one-off or recurring inspections with automated inspector matching | Must | `property-inspection` |
+| **Digital Inspection Checklist** | Room/area checklist with Pass/Fail/Attention status, draft save/resume, and photo capture | Must | `property-inspection` |
+| **Automated 48h SLA Reports** | BullMQ async report compiler generating shareable media-rich PDF/web summaries | Must | `report-worker` |
+| **Maintenance Issue Flagging** | Inspector flags issues by category (Leak, Electrical, Security, Cleanliness, Other) with photos | Must | `issue-repair` |
+| **Owner Approve / Decline Loop** | Owner reviews flagged issues with photo evidence before approving repairs or declining with reasons | Must | `issue-repair` |
+| **Verified Service Provider Matching** | Admin assigns approved repairs exclusively to vetted local providers (`verified: true` gate) | Must | `issue-repair` |
+| **End-to-End Repair Tracker** | Real-time stage visibility: `Requested` → `Assigned` → `In Progress` → `Completed` | Should | `issue-repair` |
+| **Real-Time Push Gateway** | Socket.IO room-scoped event delivery (`user:{userId}`) for instant notifications | Must | `realtime-gateway` |
+| **Role-Based Portals (RBAC)** | Dedicated, server-enforced interfaces for Owner, Inspector, Admin, and Provider | Must | `identity + gateway` |
+| **Immutable Audit Trail** | Insert-only audit logging on all approvals, assignments, and status transitions | Must | `all services` |
 
 ---
 
@@ -107,151 +112,124 @@ Small issues (leaks, electrical faults, security gaps) go undetected until they 
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## 📦 Where the Code Lives
+
+This repository holds the **documentation and architecture** for GroundPulse.
+The running code is split across the service repositories in the
+[GroundPulse-App](https://github.com/GroundPulse-App) organisation.
+
+| Repository | Kind | Responsibility |
+| :--- | :--- | :--- |
+| [`groundpulse-api-gateway`](https://github.com/GroundPulse-App/groundpulse-api-gateway) | Service | Edge routing, JWT verification, dashboard aggregation (BFF) |
+| [`groundpulse-identity-service`](https://github.com/GroundPulse-App/groundpulse-identity-service) | Service | Accounts, JWT access/refresh, CASL ability definitions |
+| [`groundpulse-property-inspection-service`](https://github.com/GroundPulse-App/groundpulse-property-inspection-service) | Service | Properties, inspections, checklist items, inspection reports |
+| [`groundpulse-issue-repair-service`](https://github.com/GroundPulse-App/groundpulse-issue-repair-service) | Service | Issue flagging, owner approval gate, repair lifecycle, provider assignment |
+| [`groundpulse-report-worker`](https://github.com/GroundPulse-App/groundpulse-report-worker) | Worker | Async report compilation off the BullMQ `reports` queue |
+| [`groundpulse-notification-service`](https://github.com/GroundPulse-App/groundpulse-notification-service) | Service | Notification records, email delivery, fan-out |
+| [`groundpulse-realtime-gateway`](https://github.com/GroundPulse-App/groundpulse-realtime-gateway) | Service | Socket.IO gateway, `user:{id}` room scoping, live status push |
+| [`groundpulse-media-service`](https://github.com/GroundPulse-App/groundpulse-media-service) | Service | Pre-signed S3/R2 upload URLs, media validation, CDN invalidation |
+| [`groundpulse-contracts`](https://github.com/GroundPulse-App/groundpulse-contracts) | Library | Shared DTOs, event payload schemas, error codes — installed by every service |
+| [`groundpulse-landing`](https://github.com/GroundPulse-App/groundpulse-landing) | Site | Public landing page — static, no build step |
+
+Why these boundaries, what deliberately stays merged, and what the split costs:
+[`docs/07_MICROSERVICE_BOUNDARIES.md`](docs/07_MICROSERVICE_BOUNDARIES.md).
+
+> **Build status.** The service repositories are scaffolded but empty — no
+> application code is committed yet. See
+> [`docs/06_WEEKLY_OJT_PROGRESS.md`](docs/06_WEEKLY_OJT_PROGRESS.md) for the
+> honest state of play.
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
-* **Node.js:** `v20.x LTS`
-* **Docker & Docker Compose:** `v24+`
+
+* **Node.js** `v20.x LTS`
+* **Docker & Docker Compose** `v24+`
 * **Git**
 
-### Step-by-Step Installation
+### Reading the docs
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Raj-vardhan01/GroundPulse.git
-   cd GroundPulse
-   ```
+```bash
+git clone git@github.com:GroundPulse-App/GroundPulse.git
+cd GroundPulse
+```
 
-2. **Install all dependencies across the monorepo:**
-   ```bash
-   npm install
-   ```
+Everything is Markdown — open [`docs/`](docs/) in any editor. Nothing to install.
 
-3. **Start local PostgreSQL and Redis services:**
-   ```bash
-   docker compose up -d
-   ```
+### Running the landing page
 
-4. **Run database migrations and seed demo data:**
-   ```bash
-   cd apps/api
-   npx prisma migrate dev
-   npx prisma db seed
-   cd ../..
-   ```
+```bash
+git clone git@github.com:GroundPulse-App/groundpulse-landing.git
+cd groundpulse-landing
+npx serve .
+```
 
-5. **Start the backend API (NestJS):**
-   ```bash
-   cd apps/api
-   npm run start:dev
-   ```
-   *API will run at `http://localhost:3001` (Swagger docs at `/api/docs`).*
+Static HTML, CSS and one JS file. No `npm install`, no build step.
 
-6. **Start the frontend application (Next.js):** *(in a new terminal)*
-   ```bash
-   cd apps/web
-   npm run dev
-   ```
-   *Frontend will run at `http://localhost:3000`.*
+### Running a service
+
+Each service repository carries its own `README`, `Dockerfile` and
+`.env.example`. The shared shape is:
+
+```bash
+git clone git@github.com:GroundPulse-App/<service-name>.git
+cd <service-name>
+npm install
+cp .env.example .env          # then fill in DATABASE_URL, REDIS_URL, JWT_SECRET
+docker compose up -d          # local Postgres 15 + Redis 7
+npx prisma migrate dev        # services that own tables
+npm run start:dev
+```
+
+Start order matters, because services depend on each other:
+
+```
+1. contracts          (publish first — everything installs it)
+2. identity-service   (issues the tokens the others verify)
+3. media-service, notification-service, realtime-gateway
+4. property-inspection-service, issue-repair-service
+5. report-worker      (needs Redis and the inspection service)
+6. api-gateway        (routes to all of the above)
+```
 
 ---
 
 ## 🧪 Running Tests
 
+Tests live with the code they cover, so run them inside each service repository:
+
 ```bash
-# Run backend unit and CASL authorization tests
-cd apps/api && npm test
+npm test                  # unit tests, including CASL authorization rules
+npm run test:coverage     # coverage report
+npm run test:integration  # Supertest against a test database
+```
 
-# Run backend test coverage suite
-cd apps/api && npm run test:coverage
+Cross-service end-to-end tests (Playwright, multi-role) run from
+`groundpulse-api-gateway`, which is the only entry point a browser talks to:
 
-# Run API integration tests (Supertest against test DB)
-cd apps/api && npm run test:integration
-
-# Run frontend unit and React Testing Library component tests
-cd apps/web && npm test
-
-# Run full multi-role End-to-End tests (Playwright)
+```bash
 npx playwright test
-
-# Run Playwright E2E tests in interactive UI mode
 npx playwright test --ui
 ```
 
----
-
-## 📁 Repository Structure
-
-```
-GroundPulse/
-├── apps/
-│   ├── web/                             # Next.js 14 App Router Frontend
-│   │   ├── app/
-│   │   │   ├── (owner)/                 # Owner portal (/dashboard, /property/[id], /issue/[id])
-│   │   │   ├── (inspector)/             # Inspector portal (/inspections, /inspection/[id]/checklist)
-│   │   │   ├── (admin)/                 # Admin oversight portal (/admin/dashboard, /reassign)
-│   │   │   ├── (provider)/              # Service provider portal (/provider/jobs)
-│   │   │   ├── (modals)/                # Intercepted modals (Add Property, Schedule Inspection)
-│   │   │   ├── layout.tsx               # Root layout + TanStack Query & Theme Providers
-│   │   │   └── middleware.ts            # Server-side role route protection
-│   │   ├── components/                  # UI components (PropertyCard, HealthScoreRing, ChecklistItemRow)
-│   │   ├── stores/                      # Zustand client stores (activeChecklistStore, realtimeStore)
-│   │   ├── hooks/                       # TanStack Query custom hooks
-│   │   └── lib/                         # apiClient, socket.io client singleton
-│   │
-│   └── api/                             # NestJS 10 Backend API
-│       ├── src/
-│       │   ├── modules/
-│       │   │   ├── property/            # Property CRUD & HealthScore calculations
-│       │   │   ├── inspection/          # Inspection scheduling & checklist submission
-│       │   │   ├── issue-repair/        # Issue flagging, owner approvals & repair lifecycle
-│       │   │   ├── provider/            # Service provider vetting & assignment
-│       │   │   ├── notification/        # Notification service & Socket.IO gateway
-│       │   │   └── admin/               # Platform metrics & reassignment services
-│       │   ├── auth/                    # Passport.js JWT strategies & CaslAbilityFactory
-│       │   ├── jobs/                    # BullMQ report generation & email workers
-│       │   ├── prisma/                  # Prisma service & schema.prisma
-│       │   └── main.ts                  # NestJS bootstrap with Helmet & CORS configuration
-│       └── Dockerfile                   # Multi-stage production container build
-│
-├── packages/
-│   └── shared-types/                    # Shared TypeScript interfaces and DTOs
-├── e2e/                                 # Playwright multi-role E2E tests
-├── docs/                                # Complete 21-chapter architectural documentation
-├── docker-compose.yml                   # Local Postgres 15 + Redis 7 definition
-└── .github/workflows/
-    ├── ci.yml                           # PR validation (Lint, Typecheck, Unit, Integration, E2E)
-    └── deploy.yml                       # CD pipeline (Docker build, ECS Fargate, Vercel prod)
-```
+Coverage targets are defined in the testing strategy: services above 90%, CASL
+guards at 100% branch coverage, components above 70%.
 
 ---
 
 ## 📚 Documentation Index
 
-For exhaustive architectural, security, database, and implementation details, refer to the individual specifications in [`docs/`](file:///c:/Users/LENOVO/Downloads/asset-project/docs):
-
-| Document | File Link |
+| Document | Contents |
 | :--- | :--- |
-| **01. Project Overview** | [`docs/01-project-overview.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/01-project-overview.md) |
-| **02. Business Requirements (BRD)** | [`docs/02-brd.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/02-brd.md) |
-| **03. Product Requirements (PRD)** | [`docs/03-prd.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/03-prd.md) |
-| **04. UX Requirements** | [`docs/04-ux-requirements.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/04-ux-requirements.md) |
-| **05. Technical Requirements (TRD)** | [`docs/05-trd.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/05-trd.md) |
-| **06. High-Level Design (HLD)** | [`docs/06-hld.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/06-hld.md) |
-| **07. Database Design & ERD** | [`docs/07-database-design.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/07-database-design.md) |
-| **08. API Specification** | [`docs/08-api-specification.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/08-api-specification.md) |
-| **09. Low-Level Design (LLD)** | [`docs/09-lld.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/09-lld.md) |
-| **10. Frontend Architecture** | [`docs/10-frontend-architecture.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/10-frontend-architecture.md) |
-| **11. Security Design & RBAC** | [`docs/11-security-design.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/11-security-design.md) |
-| **12. Testing Strategy** | [`docs/12-testing-strategy.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/12-testing-strategy.md) |
-| **13. CI/CD Pipeline** | [`docs/13-cicd-pipeline.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/13-cicd-pipeline.md) |
-| **14. Observability & Logging** | [`docs/14-observability.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/14-observability.md) |
-| **15. Deployment Architecture** | [`docs/15-deployment-architecture.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/15-deployment-architecture.md) |
-| **16. Cost Analysis** | [`docs/16-cost-analysis.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/16-cost-analysis.md) |
-| **17. Project Roadmap** | [`docs/17-project-roadmap.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/17-project-roadmap.md) |
-| **18. Team Responsibilities** | [`docs/18-team-responsibilities.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/18-team-responsibilities.md) |
-| **19. GitHub Repository Structure** | [`docs/19-github-repository-structure.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/19-github-repository-structure.md) |
-| **20. Architecture Decision Records (ADRs)** | [`docs/21-adr.md`](file:///c:/Users/LENOVO/Downloads/asset-project/docs/21-adr.md) |
+| [`01_PROBLEM_AND_VISION.md`](docs/01_PROBLEM_AND_VISION.md) | The problem, who faces it, the vision, objectives, scope boundaries and constraints |
+| [`02_COMPETITIVE_LANDSCAPE.md`](docs/02_COMPETITIVE_LANDSCAPE.md) | What owners do today, category analysis, honest weaknesses, research still owed |
+| [`03_PRD_AND_USER_STORIES.md`](docs/03_PRD_AND_USER_STORIES.md) | MoSCoW feature priority, personas, 11 user stories with acceptance criteria, user flows, NFRs |
+| [`04_SYSTEM_ARCHITECTURE.md`](docs/04_SYSTEM_ARCHITECTURE.md) | Layer stack, full tech stack, component responsibilities, data flows, scalability, security, observability |
+| [`05_CUSTOMER_DISCOVERY_LOGS.md`](docs/05_CUSTOMER_DISCOVERY_LOGS.md) | Assumptions to validate, interview guide, log template — **no interviews conducted yet** |
+| [`06_WEEKLY_OJT_PROGRESS.md`](docs/06_WEEKLY_OJT_PROGRESS.md) | 12-week plan, milestones, and a weekly log of what actually shipped |
+| [`07_MICROSERVICE_BOUNDARIES.md`](docs/07_MICROSERVICE_BOUNDARIES.md) | The nine repositories, why each is separate, what stays merged, and what the split costs |
 
 ---
 
