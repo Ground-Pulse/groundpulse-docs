@@ -39,7 +39,7 @@
 
 - Repository structure decided and created. Started as a single monorepo, then
   restructured into per-service repositories under the
-  [GroundPulse-App](https://github.com/GroundPulse-App) organisation — nine
+  [Ground-Pulse](https://github.com/Ground-Pulse) organisation — nine
   service repos plus the landing page and this docs repo.
 - Service boundaries analysed and written up in
   [07_MICROSERVICE_BOUNDARIES.md](07_MICROSERVICE_BOUNDARIES.md), including
@@ -47,7 +47,7 @@
 - Core documentation written: problem and vision, competitive landscape, PRD and
   user stories, system architecture.
 - Public landing page built and pushed to
-  [groundpulse-landing](https://github.com/GroundPulse-App/groundpulse-landing) —
+  [groundpulse-landing](https://github.com/Ground-Pulse/groundpulse-landing) —
   static HTML/CSS/JS, no build step.
 - Discovery interview guide prepared in
   [05_CUSTOMER_DISCOVERY_LOGS.md](05_CUSTOMER_DISCOVERY_LOGS.md).

@@ -2,7 +2,7 @@
 
 > **"See your property's true condition, anywhere in the world, without ever stepping through the door."**
 
-[![CI Pipeline](https://img.shields.io/badge/CI-GitHub_Actions-blue?logo=github-actions)](https://github.com/GroundPulse-App/GroundPulse/actions)
+[![CI Pipeline](https://img.shields.io/badge/CI-GitHub_Actions-blue?logo=github-actions)](https://github.com/Ground-Pulse/GroundPulse/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Frontend-Next.js_14-black?logo=next.js)](https://nextjs.org/)
 [![NestJS](https://img.shields.io/badge/Backend-NestJS_10-E0234E?logo=nestjs)](https://nestjs.com/)
@@ -11,7 +11,7 @@
 [![Redis & BullMQ](https://img.shields.io/badge/Queue-Redis_%2B_BullMQ-DC382D?logo=redis)](https://bullmq.io/)
 [![Socket.IO](https://img.shields.io/badge/Real--Time-Socket.IO-010101?logo=socket.io)](https://socket.io/)
 
-**Project Code:** `WEB-01` | **Track:** Full-Stack Web Platform Development | **Organisation:** [github.com/GroundPulse-App](https://github.com/GroundPulse-App)
+**Project Code:** `WEB-01` | **Track:** Full-Stack Web Platform Development | **Organisation:** [github.com/Ground-Pulse](https://github.com/Ground-Pulse)
 
 ---
 
@@ -116,20 +116,20 @@ empty. Priorities come from the MoSCoW breakdown in
 
 This repository holds the **documentation and architecture** for GroundPulse.
 The running code is split across the service repositories in the
-[GroundPulse-App](https://github.com/GroundPulse-App) organisation.
+[Ground-Pulse](https://github.com/Ground-Pulse) organisation.
 
 | Repository | Kind | Responsibility |
 | :--- | :--- | :--- |
-| [`groundpulse-api-gateway`](https://github.com/GroundPulse-App/groundpulse-api-gateway) | Service | Edge routing, JWT verification, dashboard aggregation (BFF) |
-| [`groundpulse-identity-service`](https://github.com/GroundPulse-App/groundpulse-identity-service) | Service | Accounts, JWT access/refresh, CASL ability definitions |
-| [`groundpulse-property-inspection-service`](https://github.com/GroundPulse-App/groundpulse-property-inspection-service) | Service | Properties, inspections, checklist items, inspection reports |
-| [`groundpulse-issue-repair-service`](https://github.com/GroundPulse-App/groundpulse-issue-repair-service) | Service | Issue flagging, owner approval gate, repair lifecycle, provider assignment |
-| [`groundpulse-report-worker`](https://github.com/GroundPulse-App/groundpulse-report-worker) | Worker | Async report compilation off the BullMQ `reports` queue |
-| [`groundpulse-notification-service`](https://github.com/GroundPulse-App/groundpulse-notification-service) | Service | Notification records, email delivery, fan-out |
-| [`groundpulse-realtime-gateway`](https://github.com/GroundPulse-App/groundpulse-realtime-gateway) | Service | Socket.IO gateway, `user:{id}` room scoping, live status push |
-| [`groundpulse-media-service`](https://github.com/GroundPulse-App/groundpulse-media-service) | Service | Pre-signed S3/R2 upload URLs, media validation, CDN invalidation |
-| [`groundpulse-contracts`](https://github.com/GroundPulse-App/groundpulse-contracts) | Library | Shared DTOs, event payload schemas, error codes — installed by every service |
-| [`groundpulse-landing`](https://github.com/GroundPulse-App/groundpulse-landing) | Site | Public landing page — static, no build step |
+| [`groundpulse-api-gateway`](https://github.com/Ground-Pulse/groundpulse-api-gateway) | Service | Edge routing, JWT verification, dashboard aggregation (BFF) |
+| [`groundpulse-identity-service`](https://github.com/Ground-Pulse/groundpulse-identity-service) | Service | Accounts, JWT access/refresh, CASL ability definitions |
+| [`groundpulse-property-inspection-service`](https://github.com/Ground-Pulse/groundpulse-property-inspection-service) | Service | Properties, inspections, checklist items, inspection reports |
+| [`groundpulse-issue-repair-service`](https://github.com/Ground-Pulse/groundpulse-issue-repair-service) | Service | Issue flagging, owner approval gate, repair lifecycle, provider assignment |
+| [`groundpulse-report-worker`](https://github.com/Ground-Pulse/groundpulse-report-worker) | Worker | Async report compilation off the BullMQ `reports` queue |
+| [`groundpulse-notification-service`](https://github.com/Ground-Pulse/groundpulse-notification-service) | Service | Notification records, email delivery, fan-out |
+| [`groundpulse-realtime-gateway`](https://github.com/Ground-Pulse/groundpulse-realtime-gateway) | Service | Socket.IO gateway, `user:{id}` room scoping, live status push |
+| [`groundpulse-media-service`](https://github.com/Ground-Pulse/groundpulse-media-service) | Service | Pre-signed S3/R2 upload URLs, media validation, CDN invalidation |
+| [`groundpulse-contracts`](https://github.com/Ground-Pulse/groundpulse-contracts) | Library | Shared DTOs, event payload schemas, error codes — installed by every service |
+| [`groundpulse-landing`](https://github.com/Ground-Pulse/groundpulse-landing) | Site | Public landing page — static, no build step |
 
 Why these boundaries, what deliberately stays merged, and what the split costs:
 [`docs/07_MICROSERVICE_BOUNDARIES.md`](docs/07_MICROSERVICE_BOUNDARIES.md).
@@ -152,7 +152,7 @@ Why these boundaries, what deliberately stays merged, and what the split costs:
 ### Reading the docs
 
 ```bash
-git clone git@github.com:GroundPulse-App/GroundPulse.git
+git clone git@github.com:Ground-Pulse/GroundPulse.git
 cd GroundPulse
 ```
 
@@ -161,7 +161,7 @@ Everything is Markdown — open [`docs/`](docs/) in any editor. Nothing to insta
 ### Running the landing page
 
 ```bash
-git clone git@github.com:GroundPulse-App/groundpulse-landing.git
+git clone git@github.com:Ground-Pulse/groundpulse-landing.git
 cd groundpulse-landing
 npx serve .
 ```
@@ -174,7 +174,7 @@ Each service repository carries its own `README`, `Dockerfile` and
 `.env.example`. The shared shape is:
 
 ```bash
-git clone git@github.com:GroundPulse-App/<service-name>.git
+git clone git@github.com:Ground-Pulse/<service-name>.git
 cd <service-name>
 npm install
 cp .env.example .env          # then fill in DATABASE_URL, REDIS_URL, JWT_SECRET
