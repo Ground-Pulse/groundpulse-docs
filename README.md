@@ -2,7 +2,7 @@
 
 > **"See your property's true condition, anywhere in the world, without ever stepping through the door."**
 
-[![CI Pipeline](https://img.shields.io/badge/CI-GitHub_Actions-blue?logo=github-actions)](https://github.com/Ground-Pulse/GroundPulse/actions)
+[![CI Pipeline](https://img.shields.io/badge/CI-GitHub_Actions-blue?logo=github-actions)](https://github.com/Ground-Pulse/groundpulse-docs/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Frontend-Next.js_14-black?logo=next.js)](https://nextjs.org/)
 [![NestJS](https://img.shields.io/badge/Backend-NestJS_10-E0234E?logo=nestjs)](https://nestjs.com/)
@@ -130,6 +130,7 @@ The running code is split across the service repositories in the
 | [`groundpulse-media-service`](https://github.com/Ground-Pulse/groundpulse-media-service) | Service | Pre-signed S3/R2 upload URLs, media validation, CDN invalidation |
 | [`groundpulse-contracts`](https://github.com/Ground-Pulse/groundpulse-contracts) | Library | Shared DTOs, event payload schemas, error codes — installed by every service |
 | [`groundpulse-landing`](https://github.com/Ground-Pulse/groundpulse-landing) | Site | Public landing page — static, no build step |
+| [`groundpulse-docs`](https://github.com/Ground-Pulse/groundpulse-docs) | Docs | This repository — architecture, PRD, service boundaries |
 
 Why these boundaries, what deliberately stays merged, and what the split costs:
 [`docs/07_MICROSERVICE_BOUNDARIES.md`](docs/07_MICROSERVICE_BOUNDARIES.md).
@@ -152,8 +153,8 @@ Why these boundaries, what deliberately stays merged, and what the split costs:
 ### Reading the docs
 
 ```bash
-git clone git@github.com:Ground-Pulse/GroundPulse.git
-cd GroundPulse
+git clone git@github.com:Ground-Pulse/groundpulse-docs.git
+cd groundpulse-docs
 ```
 
 Everything is Markdown — open [`docs/`](docs/) in any editor. Nothing to install.
