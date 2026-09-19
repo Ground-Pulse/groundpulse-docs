@@ -37,13 +37,14 @@
 
 ### Done
 
-- Repository structure decided and created. Started as a single monorepo, then
-  restructured into per-service repositories under the
-  [Ground-Pulse](https://github.com/Ground-Pulse) organisation — nine
-  service repos plus the landing page and this docs repo.
-- Service boundaries analysed and written up in
-  [07_MICROSERVICE_BOUNDARIES.md](07_MICROSERVICE_BOUNDARIES.md), including
-  which modules deliberately stay merged and why.
+- Repository structure decided and created under the
+  [Ground-Pulse](https://github.com/Ground-Pulse) organisation. It went through
+  three shapes in one week: a single monorepo, then eight services plus a
+  contracts package, then — after mentor review — one API, two queue workers,
+  a contracts package, the landing page and this docs repo. See *Decisions made*.
+- Every queue in the specification identified — there are exactly two,
+  `reports` and `notifications` — and service boundaries redrawn around them in
+  [07_MICROSERVICE_BOUNDARIES.md](07_MICROSERVICE_BOUNDARIES.md).
 - Core documentation written: problem and vision, competitive landscape, PRD and
   user stories, system architecture.
 - Public landing page built and pushed to
@@ -54,8 +55,8 @@
 
 ### Not done
 
-- No application code committed to any service repository yet — all nine are
-  empty.
+- No application code committed yet — the API, both workers and contracts are
+  all empty.
 - Local development environment (Node 20, Docker, Postgres, Redis) not yet
   stood up.
 - Auth module and `CaslAbilityFactory` not started.
@@ -67,17 +68,20 @@
 
 | Decision | Reasoning |
 | --- | --- |
-| Split into per-service repos rather than one monorepo | Chosen for the learning value of service boundaries. Recorded honestly: for a 2-person 12-week MVP the modular monolith is the lower-risk option, and the trade-off is written up in `07`. |
-| Keep property and inspection in one service | Locking a checklist and creating its report must be one transaction; splitting them would require a saga for no benefit. |
+| ~~Split into eight services plus contracts~~ **Superseded 2026-09-19** | Chosen for the learning value of service boundaries. Six of the eight did synchronous work with no reason to deploy separately. |
+| **2026-09-19, after mentor review:** only queued work gets its own service | The mentor's challenge was correct. Searching the spec found exactly two queues, `reports` and `notifications`, so exactly two workers. Everything synchronous consolidated into `groundpulse-api`; the six retired repos are archived with pointers to `07`, not deleted, so the evolution stays visible. |
+| Workers get no database credentials | Avoids three copies of `schema.prisma` and three writers to the same tables. The report worker reads a snapshot of the locked checklist from its job payload and reports back through one internal API endpoint. |
 | Landing page as a separate repo | It is an independent deployable with no database and no login. |
-| Provider logic inside issue-repair, not its own service | A network hop between "approve" and "is this provider verified" would weaken the core guarantee. |
 
 ### Next week
 
 - [ ] Stand up local Docker Postgres + Redis
 - [ ] Write the initial Prisma schema for all 10 entities
-- [ ] Scaffold `groundpulse-identity-service` with a health endpoint and Dockerfile
-- [ ] Publish the first version of `groundpulse-contracts`
+- [ ] Scaffold `groundpulse-api` with a health endpoint, Dockerfile and the auth module
+- [ ] Publish the first version of `groundpulse-contracts` with the `ReportJob` and
+      `EmailJob` schemas
+- [ ] Wire one end-to-end queue path: API enqueues a `ReportJob`, the report worker
+      logs it — proves Redis, BullMQ and the contracts package before any real logic
 - [ ] **Book at least 3 owner interviews** — this is behind and blocks nothing
       technically, which is exactly why it will keep slipping
 
@@ -86,7 +90,8 @@
 | Item | Risk |
 | --- | --- |
 | Discovery not started | Building against five unvalidated assumptions. Highest-impact item on this page. |
-| Nine empty repos | Infrastructure work is now multiplied by nine. If Week 2 does not produce a working service skeleton, consider collapsing back toward the monolith. |
+| Repository sprawl | **Resolved 2026-09-19.** Consolidated from nine code repositories to four after mentor review. |
+| No frontend repository | The Next.js app the four roles use has no repository yet. Create `groundpulse-web` when frontend work starts. |
 | Vercel deployment pending | Landing page is not yet live at a public URL. |
 
 ---

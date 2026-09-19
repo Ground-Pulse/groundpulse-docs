@@ -40,25 +40,26 @@ Small issues (leaks, electrical faults, security gaps) go undetected until they 
 
 ## ✨ Features Matrix
 
-Every feature below is **specified and designed**, with its owning service and
-priority recorded. None is implemented yet — the service repositories are still
-empty. Priorities come from the MoSCoW breakdown in
+Every feature below is **specified and designed**, with its priority and the
+repository it runs in recorded. None is implemented yet — the code repositories
+are still empty. Priorities come from the MoSCoW breakdown in
 [`docs/03_PRD_AND_USER_STORIES.md`](docs/03_PRD_AND_USER_STORIES.md).
 
-| Feature | Description | Priority | Owning service |
+| Feature | Description | Priority | Runs in |
 | :--- | :--- | :---: | :--- |
-| **Property Registration & Overview** | Add properties with address, type, and cover photo; multi-property dashboard cards | Must | `property-inspection` |
-| **Property Health Score** | Auto-computed 0–100 health score with animated SVG ring and trend history | Should | `property-inspection` |
-| **Inspection Scheduling** | Book one-off or recurring inspections with automated inspector matching | Must | `property-inspection` |
-| **Digital Inspection Checklist** | Room/area checklist with Pass/Fail/Attention status, draft save/resume, and photo capture | Must | `property-inspection` |
-| **Automated 48h SLA Reports** | BullMQ async report compiler generating shareable media-rich PDF/web summaries | Must | `report-worker` |
-| **Maintenance Issue Flagging** | Inspector flags issues by category (Leak, Electrical, Security, Cleanliness, Other) with photos | Must | `issue-repair` |
-| **Owner Approve / Decline Loop** | Owner reviews flagged issues with photo evidence before approving repairs or declining with reasons | Must | `issue-repair` |
-| **Verified Service Provider Matching** | Admin assigns approved repairs exclusively to vetted local providers (`verified: true` gate) | Must | `issue-repair` |
-| **End-to-End Repair Tracker** | Real-time stage visibility: `Requested` → `Assigned` → `In Progress` → `Completed` | Should | `issue-repair` |
-| **Real-Time Push Gateway** | Socket.IO room-scoped event delivery (`user:{userId}`) for instant notifications | Must | `realtime-gateway` |
-| **Role-Based Portals (RBAC)** | Dedicated, server-enforced interfaces for Owner, Inspector, Admin, and Provider | Must | `identity + gateway` |
-| **Immutable Audit Trail** | Insert-only audit logging on all approvals, assignments, and status transitions | Must | `all services` |
+| **Property Registration & Overview** | Add properties with address, type, and cover photo; multi-property dashboard cards | Must | `api` |
+| **Property Health Score** | Auto-computed 0–100 health score with animated SVG ring and trend history | Should | `api` |
+| **Inspection Scheduling** | Book one-off or recurring inspections with automated inspector matching | Must | `api` |
+| **Digital Inspection Checklist** | Room/area checklist with Pass/Fail/Attention status, draft save/resume, and photo capture | Must | `api` |
+| **Automated 48h SLA Reports** | BullMQ async report compiler generating shareable media-rich PDF/web summaries | Must | `api` → `report-worker` |
+| **Owner Notifications** | Email and in-app alert the moment a report is ready or an issue is flagged | Must | `api` → `notification-worker` |
+| **Maintenance Issue Flagging** | Inspector flags issues by category (Leak, Electrical, Security, Cleanliness, Other) with photos | Must | `api` |
+| **Owner Approve / Decline Loop** | Owner reviews flagged issues with photo evidence before approving repairs or declining with reasons | Must | `api` |
+| **Verified Service Provider Matching** | Admin assigns approved repairs exclusively to vetted local providers (`verified: true` gate) | Must | `api` |
+| **End-to-End Repair Tracker** | Real-time stage visibility: `Requested` → `Assigned` → `In Progress` → `Completed` | Should | `api` |
+| **Real-Time Push Gateway** | Socket.IO room-scoped event delivery (`user:{userId}`) for instant notifications | Must | `api` |
+| **Role-Based Portals (RBAC)** | Dedicated, server-enforced interfaces for Owner, Inspector, Admin, and Provider | Must | `api` |
+| **Immutable Audit Trail** | Insert-only audit logging on all approvals, assignments, and status transitions | Must | `api` |
 
 ---
 
@@ -115,27 +116,26 @@ empty. Priorities come from the MoSCoW breakdown in
 ## 📦 Where the Code Lives
 
 This repository holds the **documentation and architecture** for GroundPulse.
-The running code is split across the service repositories in the
-[Ground-Pulse](https://github.com/Ground-Pulse) organisation.
+The running code lives in the [Ground-Pulse](https://github.com/Ground-Pulse)
+organisation, split by one rule: **work gets its own service only when it is
+queued.** Everything a user waits for runs in one API.
 
 | Repository | Kind | Responsibility |
 | :--- | :--- | :--- |
-| [`groundpulse-api-gateway`](https://github.com/Ground-Pulse/groundpulse-api-gateway) | Service | Edge routing, JWT verification, dashboard aggregation (BFF) |
-| [`groundpulse-identity-service`](https://github.com/Ground-Pulse/groundpulse-identity-service) | Service | Accounts, JWT access/refresh, CASL ability definitions |
-| [`groundpulse-property-inspection-service`](https://github.com/Ground-Pulse/groundpulse-property-inspection-service) | Service | Properties, inspections, checklist items, inspection reports |
-| [`groundpulse-issue-repair-service`](https://github.com/Ground-Pulse/groundpulse-issue-repair-service) | Service | Issue flagging, owner approval gate, repair lifecycle, provider assignment |
-| [`groundpulse-report-worker`](https://github.com/Ground-Pulse/groundpulse-report-worker) | Worker | Async report compilation off the BullMQ `reports` queue |
-| [`groundpulse-notification-service`](https://github.com/Ground-Pulse/groundpulse-notification-service) | Service | Notification records, email delivery, fan-out |
-| [`groundpulse-realtime-gateway`](https://github.com/Ground-Pulse/groundpulse-realtime-gateway) | Service | Socket.IO gateway, `user:{id}` room scoping, live status push |
-| [`groundpulse-media-service`](https://github.com/Ground-Pulse/groundpulse-media-service) | Service | Pre-signed S3/R2 upload URLs, media validation, CDN invalidation |
-| [`groundpulse-contracts`](https://github.com/Ground-Pulse/groundpulse-contracts) | Library | Shared DTOs, event payload schemas, error codes — installed by every service |
+| [`groundpulse-api`](https://github.com/Ground-Pulse/groundpulse-api) | Service | Everything synchronous — auth, properties, inspections, issues, repairs, providers, admin, signed media URLs, Socket.IO. Produces jobs for both queues. |
+| [`groundpulse-report-worker`](https://github.com/Ground-Pulse/groundpulse-report-worker) | Worker | Consumes the `reports` queue and compiles inspection reports |
+| [`groundpulse-notification-worker`](https://github.com/Ground-Pulse/groundpulse-notification-worker) | Worker | Consumes the `notifications` queue and delivers email with retry |
+| [`groundpulse-contracts`](https://github.com/Ground-Pulse/groundpulse-contracts) | Library | Job payload schemas shared by the producer and both consumers |
 | [`groundpulse-landing`](https://github.com/Ground-Pulse/groundpulse-landing) | Site | Public landing page — static, no build step |
 | [`groundpulse-docs`](https://github.com/Ground-Pulse/groundpulse-docs) | Docs | This repository — architecture, PRD, service boundaries |
 
-Why these boundaries, what deliberately stays merged, and what the split costs:
+Where the two queues are, why nothing else earned a service, and what would
+justify splitting further:
 [`docs/07_MICROSERVICE_BOUNDARIES.md`](docs/07_MICROSERVICE_BOUNDARIES.md).
+Six earlier service repositories are archived in the organisation, each
+pointing back to that document.
 
-> **Build status.** The service repositories are scaffolded but empty — no
+> **Build status.** The code repositories are created but empty — no
 > application code is committed yet. See
 > [`docs/06_WEEKLY_OJT_PROGRESS.md`](docs/06_WEEKLY_OJT_PROGRESS.md) for the
 > honest state of play.
@@ -169,37 +169,41 @@ npx serve .
 
 Static HTML, CSS and one JS file. No `npm install`, no build step.
 
-### Running a service
+### Running the backend
 
-Each service repository carries its own `README`, `Dockerfile` and
-`.env.example`. The shared shape is:
+Three processes: the API and the two queue workers. Only the API talks to
+Postgres; the workers need Redis and nothing else from this list.
 
 ```bash
-git clone git@github.com:Ground-Pulse/<service-name>.git
-cd <service-name>
+# the API — owns the database
+git clone git@github.com:Ground-Pulse/groundpulse-api.git
+cd groundpulse-api
 npm install
-cp .env.example .env          # then fill in DATABASE_URL, REDIS_URL, JWT_SECRET
+cp .env.example .env          # DATABASE_URL, REDIS_URL, JWT_SECRET, S3 settings
 docker compose up -d          # local Postgres 15 + Redis 7
-npx prisma migrate dev        # services that own tables
+npx prisma migrate dev
+npm run start:dev             # http://localhost:3001
+
+# each worker, in its own terminal
+git clone git@github.com:Ground-Pulse/groundpulse-report-worker.git
+cd groundpulse-report-worker
+npm install
+cp .env.example .env          # REDIS_URL, API_URL, S3 settings
 npm run start:dev
 ```
 
-Start order matters, because services depend on each other:
+`groundpulse-notification-worker` runs the same way, with `REDIS_URL` and the
+email provider key in its `.env`.
 
-```
-1. contracts          (publish first — everything installs it)
-2. identity-service   (issues the tokens the others verify)
-3. media-service, notification-service, realtime-gateway
-4. property-inspection-service, issue-repair-service
-5. report-worker      (needs Redis and the inspection service)
-6. api-gateway        (routes to all of the above)
-```
+Start order: **`contracts`** (published first — all three install it), then
+**`api`**, then the **workers** in either order. A worker started before the API
+simply waits: its jobs sit safely in Redis until they can be processed.
 
 ---
 
 ## 🧪 Running Tests
 
-Tests live with the code they cover, so run them inside each service repository:
+Tests live with the code they cover, so run them inside each repository:
 
 ```bash
 npm test                  # unit tests, including CASL authorization rules
@@ -207,15 +211,15 @@ npm run test:coverage     # coverage report
 npm run test:integration  # Supertest against a test database
 ```
 
-Cross-service end-to-end tests (Playwright, multi-role) run from
-`groundpulse-api-gateway`, which is the only entry point a browser talks to:
+Multi-role end-to-end tests (Playwright) drive a real browser, so they will live
+with the frontend application once it exists:
 
 ```bash
 npx playwright test
 npx playwright test --ui
 ```
 
-Coverage targets are defined in the testing strategy: services above 90%, CASL
+Coverage targets are defined in the testing strategy: the API service layer above 90%, CASL
 guards at 100% branch coverage, components above 70%.
 
 ---
@@ -230,7 +234,7 @@ guards at 100% branch coverage, components above 70%.
 | [`04_SYSTEM_ARCHITECTURE.md`](docs/04_SYSTEM_ARCHITECTURE.md) | Layer stack, full tech stack, component responsibilities, data flows, scalability, security, observability |
 | [`05_CUSTOMER_DISCOVERY_LOGS.md`](docs/05_CUSTOMER_DISCOVERY_LOGS.md) | Assumptions to validate, interview guide, log template — **no interviews conducted yet** |
 | [`06_WEEKLY_OJT_PROGRESS.md`](docs/06_WEEKLY_OJT_PROGRESS.md) | 12-week plan, milestones, and a weekly log of what actually shipped |
-| [`07_MICROSERVICE_BOUNDARIES.md`](docs/07_MICROSERVICE_BOUNDARIES.md) | The nine repositories, why each is separate, what stays merged, and what the split costs |
+| [`07_MICROSERVICE_BOUNDARIES.md`](docs/07_MICROSERVICE_BOUNDARIES.md) | Where the two queues are, why only queued work gets a service, the repositories, and when to split further |
 
 ---
 
